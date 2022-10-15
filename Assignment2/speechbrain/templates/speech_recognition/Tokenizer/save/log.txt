@@ -1,0 +1,128 @@
+2022-09-23 21:12:16,681 - speechbrain.core - INFO - Beginning experiment!
+2022-09-23 21:12:16,681 - speechbrain.core - INFO - Experiment folder: ./save
+2022-09-23 21:12:17,452 - speechbrain.utils.superpowers - DEBUG - appdirs==1.4.4
+asttokens @ file:///opt/conda/conda-bld/asttokens_1646925590279/work
+atomicwrites==1.4.1
+attrs==22.1.0
+audioread==3.0.0
+backcall @ file:///home/ktietz/src/ci/backcall_1611930011877/work
+black==19.10b0
+brotlipy @ file:///D:/bld/brotlipy_1648854327487/work
+certifi @ file:///C:/b/abs_4f5wo627a3/croots/recipe/certifi_1663615677642/work/certifi
+cffi @ file:///D:/bld/cffi_1656782930891/work
+cfgv==3.3.1
+charset-normalizer @ file:///home/conda/feedstock_root/build_artifacts/charset-normalizer_1661170624537/work
+click==8.0.4
+colorama @ file:///C:/Windows/TEMP/abs_9439aeb1-0254-449a-96f7-33ab5eb17fc8apleb4yn/croots/recipe/colorama_1657009099097/work
+cryptography @ file:///D:/bld/cryptography_1657174166005/work
+cycler==0.11.0
+debugpy @ file:///C:/ci/debugpy_1637091961445/work
+decorator @ file:///opt/conda/conda-bld/decorator_1643638310831/work
+distlib==0.3.6
+entrypoints==0.3
+executing @ file:///opt/conda/conda-bld/executing_1646925071911/work
+ffmpeg-python==0.2.0
+filelock==3.8.0
+flake8==3.7.9
+fonttools==4.37.1
+future==0.18.2
+huggingface-hub==0.9.1
+HyperPyYAML==1.0.1
+identify==2.5.5
+idna @ file:///home/conda/feedstock_root/build_artifacts/idna_1642433548627/work
+ipykernel @ file:///D:/bld/ipykernel_1661804857192/work
+ipython @ file:///C:/ci/ipython_1657634415474/work
+jedi @ file:///C:/ci/jedi_1644315428289/work
+joblib==1.1.0
+jupyter-core @ file:///C:/ci/jupyter_core_1651656286743/work
+jupyter_client @ file:///C:/ci/jupyter_client_1661836943389/work
+kiwisolver==1.4.4
+librosa==0.9.2
+llvmlite==0.39.1
+matplotlib==3.5.3
+matplotlib-inline @ file:///C:/ci/matplotlib-inline_1661915841596/work
+mccabe==0.6.1
+mido==1.2.10
+mir-eval==0.7
+more-itertools==8.14.0
+nest-asyncio @ file:///C:/ci/nest-asyncio_1649829929390/work
+nodeenv==1.7.0
+numba==0.56.2
+numpy @ file:///D:/bld/numpy_1660672974567/work
+packaging @ file:///tmp/build/80754af9/packaging_1637314298585/work
+pandas==1.4.4
+parso @ file:///opt/conda/conda-bld/parso_1641458642106/work
+pathspec==0.10.1
+pickleshare @ file:///tmp/build/80754af9/pickleshare_1606932040724/work
+Pillow @ file:///D:/bld/pillow_1660386017005/work
+platformdirs==2.5.2
+pluggy==0.13.1
+pooch==1.6.0
+pre-commit==2.20.0
+prompt-toolkit @ file:///tmp/build/80754af9/prompt-toolkit_1633440160888/work
+psutil @ file:///C:/Windows/Temp/abs_b2c2fd7f-9fd5-4756-95ea-8aed74d0039flsd9qufz/croots/recipe/psutil_1656431277748/work
+pure-eval @ file:///opt/conda/conda-bld/pure_eval_1646925070566/work
+py==1.11.0
+pycodestyle==2.5.0
+pycparser @ file:///home/conda/feedstock_root/build_artifacts/pycparser_1636257122734/work
+pyflakes==2.1.1
+Pygments @ file:///opt/conda/conda-bld/pygments_1644249106324/work
+pyOpenSSL @ file:///home/conda/feedstock_root/build_artifacts/pyopenssl_1643496850550/work
+pyparsing @ file:///C:/Users/BUILDE~1/AppData/Local/Temp/abs_7f_7lba6rl/croots/recipe/pyparsing_1661452540662/work
+PySocks @ file:///D:/bld/pysocks_1661604991356/work
+pytest==5.4.1
+python-dateutil @ file:///tmp/build/80754af9/python-dateutil_1626374649649/work
+pytz==2022.2.1
+pywin32==302
+PyYAML==6.0
+pyzmq @ file:///C:/ci/pyzmq_1657615952984/work
+regex==2022.9.13
+requests @ file:///home/conda/feedstock_root/build_artifacts/requests_1661872987712/work
+resampy==0.4.0
+ruamel.yaml==0.17.21
+ruamel.yaml.clib==0.2.6
+scikit-learn==1.1.2
+scipy==1.8.1
+seaborn==0.11.2
+sentencepiece==0.1.97
+six @ file:///tmp/build/80754af9/six_1644875935023/work
+SoundFile==0.10.3.post1
+-e git+https://github.com/speechbrain/speechbrain@51f60fcab6d1155cec1fe098bcd2de012c9adbd0#egg=speechbrain
+stack-data @ file:///opt/conda/conda-bld/stack_data_1646927590127/work
+threadpoolctl==3.1.0
+toml==0.10.2
+torch==1.12.1
+torchaudio==0.12.1
+torchvision==0.13.1
+tornado @ file:///C:/ci/tornado_1606924294691/work
+tqdm==4.64.0
+traitlets @ file:///tmp/build/80754af9/traitlets_1636710298902/work
+typed-ast==1.5.4
+typing_extensions @ file:///home/conda/feedstock_root/build_artifacts/typing_extensions_1656706066251/work
+urllib3==1.26.12
+virtualenv==20.16.5
+wcwidth @ file:///Users/ktietz/demo/mc3/conda-bld/wcwidth_1629357192024/work
+win-inet-pton @ file:///D:/bld/win_inet_pton_1648771910527/work
+wincertstore==0.2
+yamllint==1.23.0
+
+
+2022-09-23 21:12:17,490 - speechbrain.utils.superpowers - DEBUG - 51f60fca
+
+
+2022-09-23 21:12:17,518 - mini_librispeech_prepare - INFO - Preparation completed in previous run, skipping.
+2022-09-23 21:12:17,519 - speechbrain.tokenizers.SentencePiece - INFO - Train tokenizer with type:unigram
+2022-09-23 21:12:17,519 - speechbrain.tokenizers.SentencePiece - INFO - Extract words sequences from:../train.json
+2022-09-23 21:12:17,530 - speechbrain.tokenizers.SentencePiece - INFO - Text file created at: ./save\train.txt
+2022-09-23 21:12:17,924 - speechbrain.tokenizers.SentencePiece - INFO - ==== Loading Tokenizer ===
+2022-09-23 21:12:17,925 - speechbrain.tokenizers.SentencePiece - INFO - Tokenizer path: ./save\1000_unigram.model
+2022-09-23 21:12:17,925 - speechbrain.tokenizers.SentencePiece - INFO - Tokenizer vocab_size: 1000
+2022-09-23 21:12:17,925 - speechbrain.tokenizers.SentencePiece - INFO - Tokenizer type: unigram
+2022-09-23 21:12:17,931 - speechbrain.tokenizers.SentencePiece - INFO - ==== Accuracy checking for recovering text from tokenizer ===
+2022-09-23 21:12:18,564 - speechbrain.tokenizers.SentencePiece - INFO - recover words from: ../train.json
+2022-09-23 21:12:18,564 - speechbrain.tokenizers.SentencePiece - INFO - Wrong recover words: 0
+2022-09-23 21:12:18,564 - speechbrain.tokenizers.SentencePiece - WARNING - accuracy recovering words: 1.0
+2022-09-23 21:12:18,565 - speechbrain.tokenizers.SentencePiece - INFO - ==== Accuracy checking for recovering text from tokenizer ===
+2022-09-23 21:12:19,144 - speechbrain.tokenizers.SentencePiece - INFO - recover words from: ../valid.json
+2022-09-23 21:12:19,144 - speechbrain.tokenizers.SentencePiece - INFO - Wrong recover words: 0
+2022-09-23 21:12:19,144 - speechbrain.tokenizers.SentencePiece - WARNING - accuracy recovering words: 1.0

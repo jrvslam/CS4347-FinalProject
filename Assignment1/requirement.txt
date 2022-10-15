@@ -1,0 +1,8 @@
+ffmpeg-python
+torch
+librosa
+soundfile
+tqdm
+mido
+mir_eval
+numpy==1.19.5
