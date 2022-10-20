@@ -9,6 +9,8 @@ import argparse
 import numpy as np
 from tqdm import tqdm
 
+import math
+
 import warnings
 warnings.filterwarnings('ignore')
 
@@ -83,113 +85,53 @@ class SingingDataset(Dataset):
         note_start = 36
         frame_size = 1024.0 / 44100.0
 
-        isSinging = False
-        isNotSinging = True
-
-        # label formart: [0/1, 0/1, octave_class_num, pitch_class_num]
+        # label format: [0/1, 0/1, octave_class_num, pitch_class_num]
         for i in range(frame_num):
             cur_time = i * frame_size
-            next_frame_time = (i + 1) * frame_size
-            label = [0, 0, 0, 0] # is_onset, is_offset, octave_class, pitch_class_number
+            label = [0, 0, 0, 0] # is_onset, is_offset, octave_class, pitch_class
             
             """ YOUR CODE HERE
             Hint: You need to consider four situations.
             1)For the silent frame 2) For the onset frame 3) For the offset frame 4) For the voiced frame
             """
-
-            # Where the cur_note starts: more than cur_note_onset
-            # Where cur_note ends: more than cur_note_offset
-            # cur_note pitch: cur_note_number
-            # Where is frame in relation to cur_note_onset and cur_note_offset
-
-            # pad start context frame: i = 0
-            # label = [0, 0, 0, 0]
-
-            # Onset Frame
-            if not isSinging and ((cur_note_onset >= cur_time and cur_note_onset <= next_frame_time) or (cur_time >= cur_note_onset)) and cur_note < len(annotation_data):
-                # print("ONSET HIT")
-                isSinging = True
-                label[0] = 1 # set is_onset to true
-                label[1] = 0
-                if cur_note_number in range(36, 48):
-                    label[2] = 0 # Octave 2
-                    label[3] = cur_note_number - note_start
-                elif cur_note_number in range(48, 60):
-                    label[2] = 1 # Octave 3
-                    label[3] = cur_note_number - note_start - 12
-                elif cur_note_number in range(60, 72):
-                    label[2] = 2 # Octave 4
-                    label[3] = cur_note_number - note_start - 24
-                elif cur_note_number in range(72, 84):
-                    label[2] = 3 # Octave 5
-                    label[3] = cur_note_number - note_start - 36
-                else:
-                    label[2] = 4 # unknown
-                    label[3] = 12 # unknown
-
-            # Offset Frame
-            elif isSinging and cur_note_offset >= cur_time and cur_note_offset <= next_frame_time and cur_note < len(annotation_data):
-                # print("OFFSET HIT")
-                isSinging = False
-                label[0] = 0
+            cur_time_end = cur_time + frame_size
+            is_silence = False
+            if (cur_time_end < cur_note_onset):
+                # Silence frame
+                is_silence = True
+            if (cur_time <= cur_note_onset and cur_note_onset < cur_time_end):
+                # Onset frame
+                label[0] = 1
+            if (cur_time <= cur_note_offset and cur_note_offset < cur_time_end):
+                # Offset frame
                 label[1] = 1
-                if cur_note_number in range(36, 48):
-                    label[2] = 0 # Octave 2
-                    label[3] = cur_note_number - note_start
-                elif cur_note_number in range(48, 60):
-                    label[2] = 1 # Octave 3
-                    label[3] = cur_note_number - note_start - 12
-                elif cur_note_number in range(60, 72):
-                    label[2] = 2 # Octave 4
-                    label[3] = cur_note_number - note_start - 24
-                elif cur_note_number in range(72, 84):
-                    label[2] = 3 # Octave 5
-                    label[3] = cur_note_number - note_start - 36
-                else:
-                    label[2] = 4 # unknown
-                    label[3] = 12 # unknown
 
-                cur_note += 1 # move cur_note to next note
-
-            # Voiced Frame
-            elif isSinging and cur_note_onset <= cur_time and cur_note_offset >= next_frame_time and cur_note < len(annotation_data):
-                # print("VOICED HIT")
-                label[0] = 0
-                label[1] = 0
-                if cur_note_number in range(36, 48):
-                    label[2] = 0 # Octave 2
-                    label[3] = cur_note_number - note_start
-                elif cur_note_number in range(48, 60):
-                    label[2] = 1 # Octave 3
-                    label[3] = cur_note_number - note_start - 12
-                elif cur_note_number in range(60, 72):
-                    label[2] = 2 # Octave 4
-                    label[3] = cur_note_number - note_start - 24
-                elif cur_note_number in range(72, 84):
-                    label[2] = 3 # Octave 5
-                    label[3] = cur_note_number - note_start - 36
-                else:
-                    label[2] = 4 # unknown
-                    label[3] = 12 # unknown
-
-
-            # Silent Frame
-            elif not isSinging or cur_note >= len(annotation_data):
-                label = [0, 0, 4, 12]
-
+            if (is_silence):
+                # Silence class
+                label[2] = 4
+                label[3] = 12
             else:
-                print("\nElse: " + str(cur_note) + "isSinging: " + str(isSinging))
-                print("\nNote: " + str(cur_note) + ", cur_time: " + str(cur_time) + ", next_frame_time: " + str(next_frame_time) + ", cur_note: [" + str(cur_note_onset) + ", " + str(cur_note_offset) + ", " + str(cur_note_number) + "] , label: " + str(label))
-                break
-
-            if cur_note < len(annotation_data):
-                cur_note_onset = annotation_data[cur_note][0]
-                cur_note_offset = annotation_data[cur_note][1]
-                cur_note_number = annotation_data[cur_note][2]
-
-                # print("Note: " + str(cur_note) + ", cur_time: " + str(cur_time) + ", next_frame_time: " + str(next_frame_time) + ", cur_note: " + str(annotation_data[cur_note]) + " , label: " + str(label))
+                # Derive octave_class and pitch_class from cur_note_number
+                # C2 to B2: 36 to 47
+                # C3 to B3: 48 to 59
+                # C4 to B4: 60 to 71
+                # C5 to B5: 72 to 83
+                note_distance_from_start = cur_note_number - note_start
+                label[2] = math.floor(note_distance_from_start / 12)
+                label[3] = note_distance_from_start % 12
 
             new_label.append(label)
+
+            if (label[1] == 1):
+                # Shift to next note
+                cur_note += 1
+                if (cur_note == len(annotation_data)):
+                    # End of song
+                    cur_note_onset = (frame_num + 1) * frame_size
+                else:
+                    cur_note_onset = annotation_data[cur_note][0]
+                    cur_note_offset = annotation_data[cur_note][1]
+                    cur_note_number = annotation_data[cur_note][2]
 
         return np.array(new_label)
 

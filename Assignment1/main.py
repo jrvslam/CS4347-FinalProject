@@ -40,9 +40,6 @@ class AST_Model:
         if not os.path.exists(save_model_dir):
             os.mkdir(save_model_dir)
 
-        print("Torch Cuda Available: ", str(torch.cuda.is_available()))
-        print("Torch Cuda Device: ", str(torch.cuda.get_device_name(device)))
-
         # Load dataset
         print('Loading datasets...')
         with open(trainset_path, 'rb') as f:
@@ -80,6 +77,7 @@ class AST_Model:
         min_valid_loss = 10000
         epoch_num = learning_params['epoch']
         valid_every_k_epoch = learning_params['valid_freq']
+        save_every_k_epoch = learning_params['save_freq']
 
         # Start training 
         print('Start training...')
@@ -92,109 +90,80 @@ class AST_Model:
         4) Printing out some necessary statistics, such as training loss of each sub-task, 
            may help you monitor the training process and understand it better.
         """
+        num_epochs_since_valid = 1
+        num_epochs_since_save = 1
 
-        for epoch in range(1, epoch_num + 1):
-            self.model.train().to(device)
+        for epoch in range(epoch_num):
+            self.model.train()
 
-            running_loss_onset = 0
-            running_loss_offset = 0
-            running_loss_octave = 0
-            running_loss_pitch = 0
-            total_loss = 0
-            num_batches = 0
+            for inputs, labels in trainset_loader:
+                inputs, labels = inputs.to(device), labels.to(device)
+                # Forward pass
+                onset_output, offset_output, pitch_octave_output, pitch_class_output = self.model(inputs)
 
-            for batch_idx, batch in enumerate(trainset_loader):
+                # Loss computing
+                onset_loss = onset_criterion(onset_output, labels[:, 0])
+                offset_loss = offset_criterion(offset_output, labels[:, 1])
+                pitch_octave_loss = octave_criterion(pitch_octave_output, labels[:, 2].long())
+                pitch_class_loss = pitch_criterion(pitch_class_output, labels[:, 3].long())
 
-                input_tensor = batch[0].to(device)
-                
-                # print("\ninput_tensor: ", input_tensor)
-                onset_label = batch[1][:, 0].float().to(device)
-                offset_label = batch[1][:, 1].float().to(device)
-                octave_label = batch[1][:, 2].long().to(device)
-                pitch_label = batch[1][:, 3].long().to(device)
-                # print("\nlabel: ", onset_label)
-
-                onset_scores, offset_scores, pitch_octave_scores, pitch_class_scores = self.model(input_tensor)
-
-                onset_loss = onset_criterion(onset_scores, onset_label)
-                offset_loss = offset_criterion(offset_scores, offset_label)
-                octave_loss = octave_criterion(pitch_octave_scores, octave_label)
-                pitch_loss = pitch_criterion(pitch_class_scores, pitch_label)
-
-                train_loss = onset_loss + offset_loss + octave_loss + pitch_loss
-
+                # Backward pass
                 optimizer.zero_grad()
-                train_loss.backward()
+                onset_loss.backward(retain_graph=True)
+                offset_loss.backward(retain_graph=True)
+                pitch_octave_loss.backward(retain_graph=True)
+                pitch_class_loss.backward()
                 optimizer.step()
 
-                num_batches += 1
-                total_loss += float(train_loss)
-                running_loss_onset += float(onset_loss)
-                running_loss_offset += float(offset_loss)
-                running_loss_octave += float(octave_loss)
-                running_loss_pitch += float(pitch_loss)
-            
-            total_loss_onset = running_loss_onset/num_batches
-            total_loss_offset = running_loss_offset/num_batches
-            total_loss_octave = running_loss_octave/num_batches
-            total_loss_pitch = running_loss_pitch/num_batches
+            if (num_epochs_since_valid == valid_every_k_epoch):
+                running_loss = 0
+                running_split_loss = np.zeros(4)
+                num_batches = 0
 
-            print('epoch = ', epoch, '\t onset loss = ', total_loss_onset*100, '\t offset loss = ', total_loss_offset*100, 
-            '\t octave loss = ', total_loss_octave*100, '\t pitch loss = ', total_loss_pitch*100)
+                self.model.eval()
+                for inputs, labels in validset_loader:
+                    inputs, labels = inputs.to(device), labels.to(device)
 
-            ave_total_train_loss = (total_loss) / (4 * num_batches)
-            isSameLoss = False
-            if total_loss == running_loss_onset + running_loss_offset + running_loss_octave + running_loss_pitch :
-                isSameLoss = True
+                    # Forward pass
+                    onset_output, offset_output, pitch_octave_output, pitch_class_output = self.model(inputs)
+
+                    # Loss computing
+                    onset_loss = onset_criterion(onset_output, labels[:, 0])
+                    offset_loss = offset_criterion(offset_output, labels[:, 1])
+                    pitch_octave_loss = octave_criterion(pitch_octave_output, labels[:, 2].long())
+                    pitch_class_loss = pitch_criterion(pitch_class_output, labels[:, 3].long())
+
+                    running_split_loss = np.add(running_split_loss, [float(onset_loss), float(offset_loss), float(pitch_octave_loss), float(pitch_class_loss)])
+
+                    num_batches += 1
+
+                running_loss = np.average(running_split_loss)
+
+                total_loss = running_loss / num_batches
+                total_onset_loss = running_split_loss[0] / num_batches
+                total_offset_loss = running_split_loss[1] / num_batches
+                total_pitch_octave_loss = running_split_loss[2] / num_batches
+                total_pitch_class_loss = running_split_loss[3] / num_batches
+
+                print('epoch=', epoch + 1)
+                print('total loss=', total_loss)
+                print('total onset loss=', total_onset_loss)
+                print('total offset loss=', total_offset_loss)
+                print('total pitch octave loss=', total_pitch_octave_loss)
+                print('total pitch class loss=', total_pitch_class_loss, '\n')
+
+                num_epochs_since_valid = 1
+                if (total_loss < min_valid_loss):
+                    best_model_id = epoch + 1
+                    min_valid_loss = total_loss
             else:
-                isSameLoss = False
-            run_loss = running_loss_onset + running_loss_offset + running_loss_octave + running_loss_pitch
-            print('isSameLoss: ', str(isSameLoss), '\t total_loss = ', str(total_loss), '\t run loss added = ', run_loss)
-            print('ave train loss = ', ave_total_train_loss)
-
-            self.model.eval().to(device)
-
-            valid_loss_onset = 0
-            valid_loss_offset = 0
-            valid_loss_octave = 0
-            valid_loss_pitch = 0
-
-            num_batches = 0
-
-            for batch_idx, batch in enumerate(validset_loader):
-                input_tensor = batch[0].to(device)
-                
-                # print("\ninput_tensor: ", input_tensor)
-                onset_label = batch[1][:, 0].float().to(device)
-                offset_label = batch[1][:, 1].float().to(device)
-                octave_label = batch[1][:, 2].long().to(device)
-                pitch_label = batch[1][:, 3].long().to(device)
-
-                onset_scores, offset_scores, pitch_octave_scores, pitch_class_scores = self.model(input_tensor)
-
-                onset_loss = onset_criterion(onset_scores, onset_label)
-                offset_loss = offset_criterion(offset_scores, offset_label)
-                octave_loss = octave_criterion(pitch_octave_scores, octave_label)
-                pitch_loss = pitch_criterion(pitch_class_scores, pitch_label)
-
-                num_batches += 1
-
-                valid_loss_onset += float(onset_loss)
-                valid_loss_offset += float(offset_loss)
-                valid_loss_octave += float(octave_loss)
-                valid_loss_pitch += float(pitch_loss)
-
-            ave_total_valid_loss = (valid_loss_onset + valid_loss_offset + valid_loss_octave + valid_loss_pitch) / (4 * num_batches)
-            print('ave valid loss = ', ave_total_valid_loss)
-
-            if min_valid_loss > ave_total_valid_loss:
-                print('Validation Loss Decreased: ', min_valid_loss, '--->', ave_total_valid_loss, '\t Saving Model')
-                min_valid_loss = ave_total_valid_loss
-                best_model_id = epoch
-                print('Best Model Id: ', best_model_id)
-                path = os.path.join(save_model_dir, "model_" + str(best_model_id))
-                torch.save(self.model.state_dict(), path)
-
+                num_epochs_since_valid += 1
+            
+            if (num_epochs_since_save == save_every_k_epoch):
+                torch.save(self.model.state_dict(), save_model_dir + '/model_' + str(epoch + 1))
+                num_epochs_since_save = 1
+            else:
+                num_epochs_since_save += 1
                 
         print('Training done in {:.1f} minutes.'.format((time.time()-start_time)/60))
         return best_model_id
@@ -324,9 +293,4 @@ if __name__ == '__main__':
     # Train and Validation
     best_model_id = ast_model.fit(args, learning_params)
     print("Best Model ID: ", best_model_id)
-    
-    
-
-
-
     
