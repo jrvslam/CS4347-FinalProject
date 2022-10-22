@@ -1,0 +1,4 @@
+speechbrain.utils.train_logger - Epoch loaded: 10 - test loss: 3.13, test CER: 69.35, test WER: 80.28
+
+%WER 80.28 [ 3722 / 4636, 174 ins, 2447 del, 1101 sub ]
+%SER 93.12 [ 447 / 480 ]
