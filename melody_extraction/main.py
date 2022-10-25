@@ -12,9 +12,7 @@ import librosa
 import numpy as np
 from tqdm import tqdm
 
-from model import BaseNN
-from dataset import SingingDataset
-
+from melody_extraction.model import BaseNN
 
 FRAME_LENGTH = librosa.frames_to_time(1, sr=44100, hop_length=1024)
 
@@ -156,6 +154,7 @@ class AST_Model:
                 if (total_loss < min_valid_loss):
                     best_model_id = epoch + 1
                     min_valid_loss = total_loss
+                    torch.save(self.model.state_dict(), save_model_dir + '/best_model')
             else:
                 num_epochs_since_valid += 1
             

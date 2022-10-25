@@ -6,9 +6,8 @@ import json
 import argparse
 import mido
 from tqdm import tqdm
-from pathlib import Path
-from main import AST_Model
-from dataset import OneSong
+from melody_extraction.main import AST_Model
+from melody_extraction.dataset import OneSong
 
 import warnings
 warnings.filterwarnings('ignore')
