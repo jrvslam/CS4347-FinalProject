@@ -17,8 +17,11 @@ from melody_extraction.main import AST_Model
 from melody_extraction.inference import predict_one_song
 from speechbrain.pretrained import EncoderDecoderASR
 from flask import Flask, jsonify, request, flash, redirect
+from flask_cors import CORS, cross_origin
 
 app = Flask(__name__)
+cors = CORS(app)
+app.config['CORS_HEADERS'] = 'Content-Type'
 
 MELODY_MODEL_PATH = '../melody_extraction/results/best_model'
 MELODY_FILE_PATH = 'upload.mp3'
@@ -39,6 +42,7 @@ def allowed_file(filename):
 
 
 @app.route('/melody', methods=['GET', 'POST'])
+@cross_origin()
 def predict_melody():
     if request.method == 'POST':
         if 'file' not in request.files:
@@ -68,6 +72,7 @@ def predict_melody():
 
 
 @app.route('/lyrics', methods=['GET', 'POST'])
+@cross_origin()
 def transcribe_lyrics():
     if request.method == 'POST':
         if 'file' not in request.files:
