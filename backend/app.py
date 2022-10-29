@@ -1,11 +1,15 @@
 import torch
 import tempfile
 from gevent.pywsgi import WSGIServer
+import librosa
+import soundfile as sf
 
 import warnings
+
 warnings.filterwarnings('ignore')
 
 import sys
+
 # Change system path to base directory
 sys.path.append("..")
 
@@ -28,6 +32,7 @@ asr_model = EncoderDecoderASR.from_hparams(
     hparams_file="hyperparams.yaml",
     savedir="pretrained_model"
 )
+
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() == 'mp3'
@@ -73,9 +78,14 @@ def transcribe_lyrics():
             flash('No selected file')
             return redirect(request.url)
         if file:
+            extension = file.filename.split(".")[-1]
             handle, filename = tempfile.mkstemp()
-            file.save(filename)
-            transcription = asr_model.transcribe_file(filename)
+            new_filename = filename + "." + extension
+            file.save(new_filename)
+            y, sr = librosa.load(new_filename)
+            if sr != 16000:
+                sf.write(new_filename, y, 16000)
+            transcription = asr_model.transcribe_file(new_filename)
             file.close()
             payload = {"text": transcription}
             return jsonify(payload)
