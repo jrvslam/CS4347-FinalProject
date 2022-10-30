@@ -86,8 +86,7 @@ def transcribe_lyrics():
             extension = file.filename.split(".")[-1]
             handle, filename = tempfile.mkstemp()
             new_filename = filename + "." + extension
-            file.save(new_filename)
-            y, sr = librosa.load(new_filename)
+            y, sr = sf.read(file.stream)
             if sr != 16000:
                 sf.write(new_filename, y, 16000)
             transcription = asr_model.transcribe_file(new_filename)
