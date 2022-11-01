@@ -14,6 +14,8 @@ from tqdm import tqdm
 
 from melody_extraction.model import BaseNN
 
+# Set seed for reproducability
+torch.manual_seed(0)
 FRAME_LENGTH = librosa.frames_to_time(1, sr=44100, hop_length=1024)
 
 class AST_Model:
