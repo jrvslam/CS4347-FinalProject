@@ -11,8 +11,8 @@ class BaseNN(nn.Module):
         self.pitch_class = pitch_class
         
         self.conv1 = nn.Conv2d(1, 32, kernel_size=(3, 3), padding=(1, 1))
-        self.conv2 = nn.Conv2d(32, 32, kernel_size=(3, 3), padding=(1, 1))
-        self.conv3 = nn.Conv2d(32, 32, kernel_size=(3, 3), padding=(1, 1))
+        self.conv2 = nn.Conv2d(32, 64, kernel_size=(3, 3), padding=(1, 1))
+        self.conv3 = nn.Conv2d(64, 32, kernel_size=(3, 3), padding=(1, 1))
         self.conv4 = nn.Conv2d(32, 16, kernel_size=(3, 3), padding=(1, 1))
         self.fc1   = nn.Linear(336, 256)
         self.fc2   = nn.Linear(256, 128)
