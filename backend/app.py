@@ -1,4 +1,5 @@
 import torch
+from torch.utils.data import DataLoader
 import tempfile
 from gevent.pywsgi import WSGIServer
 import librosa
@@ -8,13 +9,8 @@ import warnings
 
 warnings.filterwarnings('ignore')
 
-import sys
-
-# Change system path to base directory
-sys.path.append("..")
-
-from melody_extraction.main import AST_Model
-from melody_extraction.inference import predict_one_song
+from melody.main import Melody_Model
+from melody.dataset import OneSong
 from speechbrain.pretrained import EncoderDecoderASR
 from flask import Flask, jsonify, request, flash, redirect
 from flask_cors import CORS, cross_origin
@@ -28,7 +24,7 @@ MELODY_FILE_PATH = 'upload.mp3'
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-best_model = AST_Model(device, MELODY_MODEL_PATH)
+melody_model = Melody_Model(device, MELODY_MODEL_PATH)
 
 asr_model = EncoderDecoderASR.from_hparams(
     source="trained_model",
@@ -38,7 +34,7 @@ asr_model = EncoderDecoderASR.from_hparams(
 
 
 def allowed_file(filename):
-    return '.' in filename and filename.rsplit('.', 1)[1].lower() == 'mp3'
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ['mp3', 'wav']
 
 
 @app.route('/melody', methods=['GET', 'POST'])
@@ -54,14 +50,20 @@ def predict_melody():
             return redirect(request.url)
         if file and allowed_file(file.filename):
             file.save(MELODY_FILE_PATH)
-            results = {}
-            results = predict_one_song(best_model, MELODY_FILE_PATH, 'result', results, tomidi=False, output_path='',
-                                       onset_thres=0.4, offset_thres=0.5)
+            test_dataset = OneSong(MELODY_FILE_PATH, 'result')
+            test_loader = DataLoader(
+                test_dataset,
+                batch_size=1,
+                pin_memory=False,
+                shuffle=False,
+                drop_last=False,
+            )
+            results = melody_model.predict(test_loader)
             return jsonify(results)
     return '''
         <html>
             <body>
-                <form action = "http://localhost:5000/melody" method = "POST" 
+                <form action = "http://127.0.0.1:5000/melody" method = "POST" 
                     enctype = "multipart/form-data">
                     <input type = "file" name = "file" />
                     <input type = "submit"/>
@@ -96,7 +98,7 @@ def transcribe_lyrics():
     return '''
         <html>
             <body>
-                <form action = "http://localhost:5000/lyrics" method = "POST" 
+                <form action = "http://127.0.0.1:5000/melody" method = "POST" 
                     enctype = "multipart/form-data">
                     <input type = "file" name = "file" />
                     <input type = "submit"/>

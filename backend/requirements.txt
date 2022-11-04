@@ -7,4 +7,5 @@ mido
 mir_eval
 numpy==1.19.5
 Flask
+flask_cors
 gevent

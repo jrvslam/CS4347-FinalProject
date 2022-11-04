@@ -42,6 +42,5 @@ class MelodyCNN(nn.Module):
         pitch_octave_logits = pitch_out[:, 0:self.pitch_octave+1]
         pitch_class_logits = pitch_out[:, self.pitch_octave+1:]
 
-        
         return onset_logits, offset_logits, pitch_octave_logits, pitch_class_logits
 

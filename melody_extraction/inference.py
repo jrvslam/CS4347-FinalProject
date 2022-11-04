@@ -6,7 +6,7 @@ import json
 import argparse
 import mido
 from tqdm import tqdm
-from main import AST_Model
+from main import Melody_Model
 from dataset import OneSong
 
 import warnings
@@ -119,7 +119,7 @@ if __name__ == '__main__':
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     
     best_model_path = args.save_model_dir + '/best_model'
-    best_model = AST_Model(device, best_model_path)
+    best_model = Melody_Model(device, best_model_path)
     
     make_predictions(args.test_dataset_path, args.output_path, best_model, args.onset_thres, args.offset_thres)
 

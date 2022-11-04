@@ -186,22 +186,17 @@ if __name__ == "__main__":
     This script performs preprocessing raw data and prepares train/valid/test data.
     
     Sample usage:
-    python dataset.py --debug  
     python dataset.py --data_dir ./data --annotation_path ./data/annotations.json --save_dataset_dir ./data/
+    python dataset.py (All parameters default)
     """
     parser = argparse.ArgumentParser()
     parser.add_argument('--data_dir', default='./data/', help='path to the directory of data ')
     parser.add_argument('--annotation_path', default='./data/annotations.json', help='path to the annotations')
     parser.add_argument('--save_dataset_dir', default='./data/', help='path to save the generated dataset')
-    parser.add_argument('--debug', default=False, action='store_true', help='True: process one example song, False: process train and valid sets')
     
     args = parser.parse_args()
-    if args.debug == True:
-        modes = ['example']
-        annotation_path = './data/annotations_example.json'
-    else:
-        modes = ['train', 'valid']
-        annotation_path = args.annotation_path
+    modes = ['train', 'valid']
+    annotation_path = args.annotation_path
 
     for mode in modes:
         data_dir = os.path.join(args.data_dir, mode)

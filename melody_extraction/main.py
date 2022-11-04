@@ -12,7 +12,7 @@ import librosa
 import numpy as np
 from tqdm import tqdm
 
-from model import BaseNN
+from model import MelodyCNN
 from dataset import SingingDataset
 
 # Set seed for reproducability
@@ -20,14 +20,14 @@ torch.manual_seed(0)
 
 FRAME_LENGTH = librosa.frames_to_time(1, sr=44100, hop_length=1024)
 
-class AST_Model:
+class Melody_Model:
     '''
         This is main class for training model and making predictions.
     '''
     def __init__(self, device= "cuda:0", model_path=None):
         # Initialize model
         self.device = device 
-        self.model = BaseNN().to(self.device)
+        self.model = MelodyCNN().to(self.device)
         if model_path is not None:
             self.model.load_state_dict(torch.load(model_path, map_location=self.device))
             print('Model loaded.')
@@ -261,7 +261,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
    
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    ast_model = AST_Model(device)
+    ast_model = Melody_Model(device)
 
     # Set learning params
     learning_params = {
