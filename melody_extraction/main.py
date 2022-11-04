@@ -12,10 +12,12 @@ import librosa
 import numpy as np
 from tqdm import tqdm
 
-from melody_extraction.model import BaseNN
+from model import BaseNN
+from dataset import SingingDataset
 
 # Set seed for reproducability
 torch.manual_seed(0)
+
 FRAME_LENGTH = librosa.frames_to_time(1, sr=44100, hop_length=1024)
 
 class AST_Model:
@@ -76,22 +78,9 @@ class AST_Model:
         best_model_id = -1
         min_valid_loss = 10000
         epoch_num = learning_params['epoch']
-        valid_every_k_epoch = learning_params['valid_freq']
-        save_every_k_epoch = learning_params['save_freq']
 
         # Start training 
         print('Start training...')
-
-        """ YOUR CODE HERE
-        Hint: 
-        1) Complete the training script including validation every n epoch. 
-        2) Save the best model with the least validation loss 
-        3) Return the epoch id with the best model after training.
-        4) Printing out some necessary statistics, such as training loss of each sub-task, 
-           may help you monitor the training process and understand it better.
-        """
-        num_epochs_since_valid = 1
-        num_epochs_since_save = 1
 
         for epoch in range(epoch_num):
             self.model.train()
@@ -115,56 +104,47 @@ class AST_Model:
                 pitch_class_loss.backward()
                 optimizer.step()
 
-            if (num_epochs_since_valid == valid_every_k_epoch):
-                running_loss = 0
-                running_split_loss = np.zeros(4)
-                num_batches = 0
+            # Vaidate
+            running_loss = 0
+            running_split_loss = np.zeros(4)
+            num_batches = 0
 
-                self.model.eval()
-                for inputs, labels in validset_loader:
-                    inputs, labels = inputs.to(device), labels.to(device)
+            self.model.eval()
+            for inputs, labels in validset_loader:
+                inputs, labels = inputs.to(device), labels.to(device)
 
-                    # Forward pass
-                    onset_output, offset_output, pitch_octave_output, pitch_class_output = self.model(inputs)
+                # Forward pass
+                onset_output, offset_output, pitch_octave_output, pitch_class_output = self.model(inputs)
 
-                    # Loss computing
-                    onset_loss = onset_criterion(onset_output, labels[:, 0])
-                    offset_loss = offset_criterion(offset_output, labels[:, 1])
-                    pitch_octave_loss = octave_criterion(pitch_octave_output, labels[:, 2].long())
-                    pitch_class_loss = pitch_criterion(pitch_class_output, labels[:, 3].long())
+                # Loss computing
+                onset_loss = onset_criterion(onset_output, labels[:, 0])
+                offset_loss = offset_criterion(offset_output, labels[:, 1])
+                pitch_octave_loss = octave_criterion(pitch_octave_output, labels[:, 2].long())
+                pitch_class_loss = pitch_criterion(pitch_class_output, labels[:, 3].long())
 
-                    running_split_loss = np.add(running_split_loss, [float(onset_loss), float(offset_loss), float(pitch_octave_loss), float(pitch_class_loss)])
+                running_split_loss = np.add(running_split_loss, [float(onset_loss), float(offset_loss), float(pitch_octave_loss), float(pitch_class_loss)])
 
-                    num_batches += 1
+                num_batches += 1
 
-                running_loss = np.average(running_split_loss)
+            running_loss = np.average(running_split_loss)
 
-                total_loss = running_loss / num_batches
-                total_onset_loss = running_split_loss[0] / num_batches
-                total_offset_loss = running_split_loss[1] / num_batches
-                total_pitch_octave_loss = running_split_loss[2] / num_batches
-                total_pitch_class_loss = running_split_loss[3] / num_batches
+            total_loss = running_loss / num_batches
+            total_onset_loss = running_split_loss[0] / num_batches
+            total_offset_loss = running_split_loss[1] / num_batches
+            total_pitch_octave_loss = running_split_loss[2] / num_batches
+            total_pitch_class_loss = running_split_loss[3] / num_batches
 
-                print('epoch=', epoch + 1)
-                print('total loss=', total_loss)
-                print('total onset loss=', total_onset_loss)
-                print('total offset loss=', total_offset_loss)
-                print('total pitch octave loss=', total_pitch_octave_loss)
-                print('total pitch class loss=', total_pitch_class_loss, '\n')
+            print('epoch=', epoch + 1)
+            print('total loss=', total_loss)
+            print('total onset loss=', total_onset_loss)
+            print('total offset loss=', total_offset_loss)
+            print('total pitch octave loss=', total_pitch_octave_loss)
+            print('total pitch class loss=', total_pitch_class_loss, '\n')
 
-                num_epochs_since_valid = 1
-                if (total_loss < min_valid_loss):
-                    best_model_id = epoch + 1
-                    min_valid_loss = total_loss
-                    torch.save(self.model.state_dict(), save_model_dir + '/best_model')
-            else:
-                num_epochs_since_valid += 1
-            
-            if (num_epochs_since_save == save_every_k_epoch):
-                torch.save(self.model.state_dict(), save_model_dir + '/model_' + str(epoch + 1))
-                num_epochs_since_save = 1
-            else:
-                num_epochs_since_save += 1
+            if (total_loss < min_valid_loss):
+                best_model_id = epoch + 1
+                min_valid_loss = total_loss
+                torch.save(self.model.state_dict(), save_model_dir + '/best_model')
                 
         print('Training done in {:.1f} minutes.'.format((time.time()-start_time)/60))
         return best_model_id
@@ -265,14 +245,14 @@ class AST_Model:
 
 
 if __name__ == '__main__':
-    """
+    '''
     This script performs training and validation of the singing transcription model.
     
     Sample usage:
     python main.py --train_dataset_path ./data/train.pkl --valid_dataset_path ./data/valid.pkl --save_model_dir ./results
     or 
     python main.py (All parameters are defualt)
-    """
+    '''
     parser = argparse.ArgumentParser()
     parser.add_argument('--train_dataset_path', default='./data/train.pkl', help='path to the train set')
     parser.add_argument('--valid_dataset_path', default='./data/valid.pkl', help='path to the valid set')
@@ -288,10 +268,9 @@ if __name__ == '__main__':
         'batch_size': 50,
         'epoch': 5,
         'lr': 1e-4,
-        'valid_freq': 1,
-        'save_freq': 1
     }
+
     # Train and Validation
     best_model_id = ast_model.fit(args, learning_params)
-    print("Best Model ID: ", best_model_id)
+    print('Best Epoch: ', best_model_id)
     
