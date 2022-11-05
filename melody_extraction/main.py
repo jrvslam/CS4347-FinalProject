@@ -14,6 +14,7 @@ from tqdm import tqdm
 
 from model import MelodyCNN
 from dataset import SingingDataset
+from pitch_correction import perform_pitch_correction
 
 # Set seed for reproducability
 torch.manual_seed(0)
@@ -239,7 +240,7 @@ class Melody_Model:
 
             # Parse frame info into output format for every song
             for song_id, frame_info in song_frames_table.items():
-                results[song_id] = self.parse_frame_info(frame_info, onset_thres=onset_thres, offset_thres=offset_thres)
+                results[song_id] = perform_pitch_correction(self.parse_frame_info(frame_info, onset_thres=onset_thres, offset_thres=offset_thres))
         
         return results
 
