@@ -9,3 +9,7 @@ numpy==1.19.5
 Flask
 flask_cors
 gevent
+transformers
+datasets
+pyctcdecode
+kenlm
