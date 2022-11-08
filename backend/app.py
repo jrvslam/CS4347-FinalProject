@@ -41,15 +41,18 @@ processor_with_lm = Wav2Vec2ProcessorWithLM(
 
 print("ASR loaded!")
 
-if not os.path.exists("temp_folder"):
-    os.mkdir("temp_folder")
-
 app = Flask(__name__)
 cors = CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
 
 MELODY_MODEL_PATH = '../melody_extraction/results/best_model'
 MELODY_FILE_PATH = 'upload.mp3'
+LYRICS_FILE_DUMP_PATH = "temp_folder"
+
+
+if not os.path.exists(LYRICS_FILE_DUMP_PATH):
+    os.mkdir(LYRICS_FILE_DUMP_PATH)
+
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 melody_model = Melody_Model(device, MELODY_MODEL_PATH)
@@ -108,7 +111,7 @@ def transcribe_lyrics():
             return redirect(request.url)
         if file:
             extension = file.filename.split(".")[-1]
-            new_filename = os.path.join("temp_folder", "temp" + "." + extension)
+            new_filename = os.path.join(LYRICS_FILE_DUMP_PATH, "temp" + "." + extension)
             y, sr = sf.read(file.stream)
             sf.write(new_filename, y, 16000)
             audio_dataset = Dataset.from_dict({"audio": [new_filename]}).cast_column("audio", Audio())
