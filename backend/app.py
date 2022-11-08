@@ -1,19 +1,48 @@
-import torch
-from torch.utils.data import DataLoader
-import tempfile
-from gevent.pywsgi import WSGIServer
-import librosa
-import soundfile as sf
-
+import os
 import warnings
+
+import soundfile as sf
+import torch
+from datasets import Dataset, Audio
+from flask import Flask, jsonify, request, flash, redirect
+from flask_cors import CORS, cross_origin
+from gevent.pywsgi import WSGIServer
+from torch.utils.data import DataLoader
+from transformers import Wav2Vec2Processor, Wav2Vec2ForCTC, Wav2Vec2ProcessorWithLM
+
+from pyctcdecode import build_ctcdecoder
+
+from melody.dataset import OneSong
+from melody.main import Melody_Model
 
 warnings.filterwarnings('ignore')
 
-from melody.main import Melody_Model
-from melody.dataset import OneSong
-from speechbrain.pretrained import EncoderDecoderASR
-from flask import Flask, jsonify, request, flash, redirect
-from flask_cors import CORS, cross_origin
+processor = Wav2Vec2Processor.from_pretrained("checkpoint-4000")
+lyrics_model = Wav2Vec2ForCTC.from_pretrained(
+    "checkpoint-4000",
+    ctc_loss_reduction="mean",
+    pad_token_id=processor.tokenizer.pad_token_id,
+)
+
+vocab_dict = processor.tokenizer.get_vocab()
+sorted_vocab_dict = {k: v for k, v in sorted(vocab_dict.items(), key=lambda item: item[1])}
+
+# build the decoder
+decoder = build_ctcdecoder(
+    labels=list(sorted_vocab_dict.keys()),
+    kenlm_model_path="checkpoint-4000/3gram.arpa",
+)
+
+processor_with_lm = Wav2Vec2ProcessorWithLM(
+    feature_extractor=processor.feature_extractor,
+    tokenizer=processor.tokenizer,
+    decoder=decoder
+)
+
+print("ASR loaded!")
+
+if not os.path.exists("temp_folder"):
+    os.mkdir("temp_folder")
 
 app = Flask(__name__)
 cors = CORS(app)
@@ -23,14 +52,7 @@ MELODY_MODEL_PATH = '../melody_extraction/results/best_model'
 MELODY_FILE_PATH = 'upload.mp3'
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-
 melody_model = Melody_Model(device, MELODY_MODEL_PATH)
-
-asr_model = EncoderDecoderASR.from_hparams(
-    source="trained_model",
-    hparams_file="hyperparams.yaml",
-    savedir="pretrained_model"
-)
 
 
 def allowed_file(filename):
@@ -86,12 +108,13 @@ def transcribe_lyrics():
             return redirect(request.url)
         if file:
             extension = file.filename.split(".")[-1]
-            handle, filename = tempfile.mkstemp()
-            new_filename = filename + "." + extension
+            new_filename = os.path.join("temp_folder", "temp" + "." + extension)
             y, sr = sf.read(file.stream)
-            if sr != 16000:
-                sf.write(new_filename, y, 16000)
-            transcription = asr_model.transcribe_file(new_filename)
+            sf.write(new_filename, y, 16000)
+            audio_dataset = Dataset.from_dict({"audio": [new_filename]}).cast_column("audio", Audio())
+            input_features = processor(audio_dataset[0]["audio"]["array"], return_tensors="pt").input_values
+            logits = lyrics_model(input_features).logits
+            transcription = processor_with_lm.batch_decode(logits.detach().numpy()).text
             file.close()
             payload = {"text": transcription}
             return jsonify(payload)
