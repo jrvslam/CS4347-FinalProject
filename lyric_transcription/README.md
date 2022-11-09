@@ -31,6 +31,12 @@ where
 `--checkpoint_folder - Place to store model checkpoints`
 
 
+## Training the n-gram Language Model:
+
+To train an n-gram language model, we use the [KenLM package](https://github.com/kpu/kenlm).
+Please refer to the instructions provided in the KenLM repository for setting up the package and building an n-gram language model.
+It is recommended to take the transcriptions from the training corpus, and dump each transcription in a new-line separated text file, and use that with KenLM for training the language model.
+
 ## Run Lyric Transcription for one file:
  
 To perform lyric transcription for one file, run:
