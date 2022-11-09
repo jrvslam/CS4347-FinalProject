@@ -110,7 +110,6 @@ if __name__ == '__main__':
     parser.add_argument('--test_dataset_path', default='./data/test', help='path to the input audio/folder')
     parser.add_argument('--output_path', default='./data/predictions.json', help='path to the output prediction json')
     parser.add_argument('--save_model_dir', default='./results', help='path to the trained model')
-    parser.add_argument('--best_model_id', help='best model id got in the training and validation')
     parser.add_argument('--onset_thres', default=0.4, help='onset threshold')
     parser.add_argument('--offset_thres', default=0.5, help='offset threshold')
     

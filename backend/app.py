@@ -45,7 +45,7 @@ app = Flask(__name__)
 cors = CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
 
-MELODY_MODEL_PATH = '../melody_extraction/results/best_model'
+MELODY_MODEL_PATH = './melody/best_model'
 MELODY_FILE_PATH = 'upload.mp3'
 LYRICS_FILE_DUMP_PATH = "temp_folder"
 

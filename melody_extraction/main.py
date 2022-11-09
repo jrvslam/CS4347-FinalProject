@@ -266,7 +266,7 @@ if __name__ == '__main__':
     # Set learning params
     learning_params = {
         'batch_size': 50,
-        'epoch': 5,
+        'epoch': 1,
         'lr': 1e-4,
     }
 
