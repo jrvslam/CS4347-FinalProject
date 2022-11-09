@@ -47,3 +47,15 @@ where
 
 The script runs the trained Wav2Vec2 model  on the file and prints the transcribed lyrics. 
 The transcribed lyrics are also stored in a file called **"transcribed_output.txt"**
+
+
+# References and Resources
+
+The following links and blogs were extremely useful in terms of understanding the various concepts, and utilizing code to train our models with on the new lyric dataset.
+
+* [Fine-Tune Wav2Vec2 for English ASR with 🤗 Transformers](https://huggingface.co/blog/fine-tune-wav2vec2-english)
+* [Boosting Wav2Vec2 with n-grams in 🤗 Transformers](https://huggingface.co/blog/wav2vec2-with-ngram)
+* [Using N-Gram LMs with Wav2Vec2](http://mohitmayank.com/a_lazy_data_science_guide/audio_intelligence/wav2vec2/)
+* [Fine-Tune Whisper For Multilingual ASR with 🤗 Transformers](https://huggingface.co/blog/fine-tune-whisper)
+
+
