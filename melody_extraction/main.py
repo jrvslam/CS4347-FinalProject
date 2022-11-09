@@ -1,4 +1,3 @@
-
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -208,7 +207,7 @@ class Melody_Model:
 
         return result
 
-    def predict(self, test_loader, results={}, onset_thres=0.1, offset_thres=0.5):
+    def predict(self, test_loader, results={}, onset_thres=0.4, offset_thres=0.5):
         """Predict results for a given test dataset."""
 
         # Start predicting
