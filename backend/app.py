@@ -46,12 +46,11 @@ cors = CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
 
 MELODY_MODEL_PATH = './melody/best_model'
-MELODY_FILE_PATH = 'upload.mp3'
-LYRICS_FILE_DUMP_PATH = "temp_folder"
+FILE_DUMP_PATH = "temp_folder"
 
 
-if not os.path.exists(LYRICS_FILE_DUMP_PATH):
-    os.mkdir(LYRICS_FILE_DUMP_PATH)
+if not os.path.exists(FILE_DUMP_PATH):
+    os.mkdir(FILE_DUMP_PATH)
 
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -74,8 +73,11 @@ def predict_melody():
             flash('No selected file')
             return redirect(request.url)
         if file and allowed_file(file.filename):
-            file.save(MELODY_FILE_PATH)
-            test_dataset = OneSong(MELODY_FILE_PATH, 'result')
+            extension = file.filename.split(".")[-1]
+            new_filename = os.path.join(FILE_DUMP_PATH, "temp" + "." + extension)
+            y, sr = sf.read(file.stream)
+            sf.write(new_filename, y, 16000)
+            test_dataset = OneSong(new_filename, 'result')
             test_loader = DataLoader(
                 test_dataset,
                 batch_size=1,
@@ -109,9 +111,9 @@ def transcribe_lyrics():
         if file.filename == '':
             flash('No selected file')
             return redirect(request.url)
-        if file:
+        if file and allowed_file(file.filename):
             extension = file.filename.split(".")[-1]
-            new_filename = os.path.join(LYRICS_FILE_DUMP_PATH, "temp" + "." + extension)
+            new_filename = os.path.join(FILE_DUMP_PATH, "temp" + "." + extension)
             y, sr = sf.read(file.stream)
             sf.write(new_filename, y, 16000)
             audio_dataset = Dataset.from_dict({"audio": [new_filename]}).cast_column("audio", Audio())
@@ -124,7 +126,7 @@ def transcribe_lyrics():
     return '''
         <html>
             <body>
-                <form action = "http://127.0.0.1:5000/melody" method = "POST" 
+                <form action = "http://127.0.0.1:5000/lyrics" method = "POST" 
                     enctype = "multipart/form-data">
                     <input type = "file" name = "file" />
                     <input type = "submit"/>
