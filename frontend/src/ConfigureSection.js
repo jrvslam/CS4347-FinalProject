@@ -76,7 +76,7 @@ export function ConfigureSection() {
             } else {
                 dispatch(setProcessState(2));
             }
-            
+
             return res.json();
         })
         .then(result => {
@@ -109,8 +109,8 @@ export function ConfigureSection() {
             return res.json();
         })
         .then(result => {
-            console.log("Results: ", result.result);
-            lyricRes = result.result;
+            console.log("Results: ", result.text);
+            lyricRes = result.text;
             dispatch(setLyricRes(lyricRes));
             
         })
