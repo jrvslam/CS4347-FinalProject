@@ -9,7 +9,7 @@ from flask_cors import CORS, cross_origin
 from gevent.pywsgi import WSGIServer
 from torch.utils.data import DataLoader
 from transformers import Wav2Vec2Processor, Wav2Vec2ForCTC, Wav2Vec2ProcessorWithLM
-
+from transformers import AutomaticSpeechRecognitionPipeline
 from pyctcdecode import build_ctcdecoder
 
 from melody.dataset import OneSong
@@ -39,18 +39,23 @@ processor_with_lm = Wav2Vec2ProcessorWithLM(
     decoder=decoder
 )
 
+pipeline = AutomaticSpeechRecognitionPipeline(model=lyrics_model, decoder = decoder,
+                                              feature_extractor = processor.feature_extractor,
+                                              tokenizer = processor.tokenizer,
+                                              chunk_length_s=6)
 print("ASR loaded!")
 
 app = Flask(__name__)
 cors = CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
 
-MELODY_MODEL_PATH = './melody/best_model'
-FILE_DUMP_PATH = "temp_folder"
+MELODY_MODEL_PATH = '../melody_extraction/results/best_model'
+MELODY_FILE_PATH = 'upload.mp3'
+LYRICS_FILE_DUMP_PATH = "temp_folder"
 
 
-if not os.path.exists(FILE_DUMP_PATH):
-    os.mkdir(FILE_DUMP_PATH)
+if not os.path.exists(LYRICS_FILE_DUMP_PATH):
+    os.mkdir(LYRICS_FILE_DUMP_PATH)
 
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -73,11 +78,8 @@ def predict_melody():
             flash('No selected file')
             return redirect(request.url)
         if file and allowed_file(file.filename):
-            extension = file.filename.split(".")[-1]
-            new_filename = os.path.join(FILE_DUMP_PATH, "temp" + "." + extension)
-            y, sr = sf.read(file.stream)
-            sf.write(new_filename, y, 16000)
-            test_dataset = OneSong(new_filename, 'result')
+            file.save(MELODY_FILE_PATH)
+            test_dataset = OneSong(MELODY_FILE_PATH, 'result')
             test_loader = DataLoader(
                 test_dataset,
                 batch_size=1,
@@ -111,22 +113,19 @@ def transcribe_lyrics():
         if file.filename == '':
             flash('No selected file')
             return redirect(request.url)
-        if file and allowed_file(file.filename):
+        if file:
             extension = file.filename.split(".")[-1]
-            new_filename = os.path.join(FILE_DUMP_PATH, "temp" + "." + extension)
+            new_filename = os.path.join(LYRICS_FILE_DUMP_PATH, "temp" + "." + extension)
             y, sr = sf.read(file.stream)
-            sf.write(new_filename, y, 16000)
-            audio_dataset = Dataset.from_dict({"audio": [new_filename]}).cast_column("audio", Audio())
-            input_features = processor(audio_dataset[0]["audio"]["array"], return_tensors="pt").input_values
-            logits = lyrics_model(input_features).logits
-            transcription = processor_with_lm.batch_decode(logits.detach().numpy()).text
+            sf.write(new_filename, y, sr)
+            transcription = pipeline(new_filename)
             file.close()
             payload = {"text": transcription}
             return jsonify(payload)
     return '''
         <html>
             <body>
-                <form action = "http://127.0.0.1:5000/lyrics" method = "POST" 
+                <form action = "http://127.0.0.1:5000/melody" method = "POST" 
                     enctype = "multipart/form-data">
                     <input type = "file" name = "file" />
                     <input type = "submit"/>
