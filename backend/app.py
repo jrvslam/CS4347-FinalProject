@@ -9,7 +9,7 @@ from flask_cors import CORS, cross_origin
 from gevent.pywsgi import WSGIServer
 from torch.utils.data import DataLoader
 from transformers import Wav2Vec2Processor, Wav2Vec2ForCTC, Wav2Vec2ProcessorWithLM
-
+from transformers import AutomaticSpeechRecognitionPipeline
 from pyctcdecode import build_ctcdecoder
 
 from melody.dataset import OneSong
@@ -39,13 +39,17 @@ processor_with_lm = Wav2Vec2ProcessorWithLM(
     decoder=decoder
 )
 
+pipeline = AutomaticSpeechRecognitionPipeline(model=lyrics_model, decoder = decoder,
+                                              feature_extractor = processor.feature_extractor,
+                                              tokenizer = processor.tokenizer,
+                                              chunk_length_s=6)
 print("ASR loaded!")
 
 app = Flask(__name__)
 cors = CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
 
-MELODY_MODEL_PATH = './melody/best_model'
+MELODY_MODEL_PATH = '../melody_extraction/results/best_model'
 MELODY_FILE_PATH = 'upload.mp3'
 LYRICS_FILE_DUMP_PATH = "temp_folder"
 
@@ -113,11 +117,8 @@ def transcribe_lyrics():
             extension = file.filename.split(".")[-1]
             new_filename = os.path.join(LYRICS_FILE_DUMP_PATH, "temp" + "." + extension)
             y, sr = sf.read(file.stream)
-            sf.write(new_filename, y, 16000)
-            audio_dataset = Dataset.from_dict({"audio": [new_filename]}).cast_column("audio", Audio())
-            input_features = processor(audio_dataset[0]["audio"]["array"], return_tensors="pt").input_values
-            logits = lyrics_model(input_features).logits
-            transcription = processor_with_lm.batch_decode(logits.detach().numpy()).text
+            sf.write(new_filename, y, sr)
+            transcription = pipeline(new_filename)
             file.close()
             payload = {"text": transcription}
             return jsonify(payload)

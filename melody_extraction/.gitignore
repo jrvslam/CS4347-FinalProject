@@ -1,3 +1,4 @@
 data/*
 predictions/*
 __pycache__/
+.DS_Store
