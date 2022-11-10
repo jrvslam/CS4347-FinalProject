@@ -80,7 +80,7 @@ export function ConfigureSection() {
             return res.json();
         })
         .then(result => {
-            console.log("Results: ", result.result);
+            console.log("MELODY Results: ", result.result);
             melodyRes = result.result;
             dispatch(setMelodyRes(melodyRes));
             
@@ -109,7 +109,7 @@ export function ConfigureSection() {
             return res.json();
         })
         .then(result => {
-            console.log("Results: ", result.result);
+            console.log("LYRICS Results: ", result.result);
             lyricRes = result.result;
             dispatch(setLyricRes(lyricRes));
             
