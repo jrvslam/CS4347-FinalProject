@@ -17,6 +17,11 @@ from melody.main import Melody_Model
 
 warnings.filterwarnings('ignore')
 
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+
+MELODY_MODEL_PATH = '../melody_extraction/results/best_model'
+FILE_DUMP_PATH = "temp_folder"
+
 processor = Wav2Vec2Processor.from_pretrained("checkpoint-4000")
 lyrics_model = Wav2Vec2ForCTC.from_pretrained(
     "checkpoint-4000",
@@ -43,28 +48,19 @@ pipeline = AutomaticSpeechRecognitionPipeline(model=lyrics_model, decoder = deco
                                               feature_extractor = processor.feature_extractor,
                                               tokenizer = processor.tokenizer,
                                               chunk_length_s=6)
-print("ASR loaded!")
+
+melody_model = Melody_Model(device, MELODY_MODEL_PATH)
+print("Models loaded!")
 
 app = Flask(__name__)
 cors = CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
 
-MELODY_MODEL_PATH = '../melody_extraction/results/best_model'
-MELODY_FILE_PATH = 'upload.mp3'
-LYRICS_FILE_DUMP_PATH = "temp_folder"
-
-
-if not os.path.exists(LYRICS_FILE_DUMP_PATH):
-    os.mkdir(LYRICS_FILE_DUMP_PATH)
-
-
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-melody_model = Melody_Model(device, MELODY_MODEL_PATH)
-
+if not os.path.exists(FILE_DUMP_PATH):
+    os.mkdir(FILE_DUMP_PATH)
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ['mp3', 'wav']
-
 
 @app.route('/melody', methods=['GET', 'POST'])
 @cross_origin()
@@ -78,8 +74,11 @@ def predict_melody():
             flash('No selected file')
             return redirect(request.url)
         if file and allowed_file(file.filename):
-            file.save(MELODY_FILE_PATH)
-            test_dataset = OneSong(MELODY_FILE_PATH, 'result')
+            extension = file.filename.split(".")[-1]
+            new_filename = os.path.join(FILE_DUMP_PATH, "temp" + "." + extension)
+            y, sr = sf.read(file.stream)
+            sf.write(new_filename, y, sr)
+            test_dataset = OneSong(new_filename, 'result')
             test_loader = DataLoader(
                 test_dataset,
                 batch_size=1,
@@ -113,9 +112,9 @@ def transcribe_lyrics():
         if file.filename == '':
             flash('No selected file')
             return redirect(request.url)
-        if file:
+        if file and allowed_file(file.filename):
             extension = file.filename.split(".")[-1]
-            new_filename = os.path.join(LYRICS_FILE_DUMP_PATH, "temp" + "." + extension)
+            new_filename = os.path.join(FILE_DUMP_PATH, "temp" + "." + extension)
             y, sr = sf.read(file.stream)
             sf.write(new_filename, y, sr)
             transcription = pipeline(new_filename)
@@ -125,7 +124,7 @@ def transcribe_lyrics():
     return '''
         <html>
             <body>
-                <form action = "http://127.0.0.1:5000/melody" method = "POST" 
+                <form action = "http://127.0.0.1:5000/lyrics" method = "POST" 
                     enctype = "multipart/form-data">
                     <input type = "file" name = "file" />
                     <input type = "submit"/>
