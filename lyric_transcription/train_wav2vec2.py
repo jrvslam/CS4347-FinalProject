@@ -117,8 +117,6 @@ if __name__ == "__main__":
 
     parser.add_argument("--train_csv")  # path to csv with DSing and N20EM train information
     parser.add_argument("--val_csv")  # path to csv with DSing and N20EM val information
-    # parser.add_argument("--dsing_csv")  # path to csv with DSing test information
-    # parser.add_argument("--nem_csv")  # path to csv with N20EM test information
     parser.add_argument("--checkpoint_folder")  # path to save the model checkpoints to
 
     args = parser.parse_args()
