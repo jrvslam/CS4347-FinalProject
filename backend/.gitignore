@@ -1,2 +1,4 @@
 __pycache__/
-upload.mp3
+temp_folder/
+checkpoint-4000/
+.DS_Store

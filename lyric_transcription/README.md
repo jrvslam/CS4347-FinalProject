@@ -19,7 +19,8 @@ This folder provides the code resources for training the Lyric Transcription Mod
  
 To train the Wav2Vec2 model, run:
 
-```python train_wav2vec2.py --train_csv <path_to_train_csv> --val_csv <path_to_val_csv> --checkpoint_folder <path_to_store_checkpoint>```
+    
+    python train_wav2vec2.py --train_csv <path_to_train_csv> --val_csv <path_to_val_csv> --checkpoint_folder <path_to_store_checkpoint>
     
     
 where 
@@ -41,7 +42,7 @@ It is recommended to take the transcriptions from the training corpus, and dump 
  
 To perform lyric transcription for one file, run:
 
-```python perform_lyrics_transcription_one_file.py --checkpoint_path <path_to_model_checkpoint> --lm_model_file <path_to_lm_model> --audio_path <path_to_audio_file>```    
+    python perform_lyrics_transcription_one_file.py --checkpoint_path <path_to_model_checkpoint> --lm_model_file <path_to_lm_model> --audio_path <path_to_audio_file>    
     
 where 
 
