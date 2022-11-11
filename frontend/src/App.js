@@ -19,7 +19,7 @@ function App() {
           <Grid xs={3} align="center">
             <Box m={2}>
               <Paper elevation={3}>
-                <Box p={2} sx={{ height: 500 }}>
+                <Box p={2} sx={{ height: 600 }}>
                   {
                     ConfigureSection()
                   }
@@ -30,7 +30,7 @@ function App() {
           <Grid xs={9} align="center">
             <Box m={2}>
               <Paper elevation={3}>
-                <Box p={2} sx={{ height: 500 }}>
+                <Box p={2} sx={{ height: 600 }}>
                   {
                     ResultsSection()
                   }
