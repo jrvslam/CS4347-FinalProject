@@ -171,7 +171,7 @@ if __name__ == "__main__":
 
     data_collator = DataCollatorCTCWithPadding(processor=processor, padding=True)
 
-    processor = Wav2Vec2Processor.from_pretrained("wav2vec2_checkpoints")
+    processor = Wav2Vec2Processor.from_pretrained(args.model_checkpoint)
 
     model = model.to('cuda' if torch.cuda.is_available() else 'cpu')
 
