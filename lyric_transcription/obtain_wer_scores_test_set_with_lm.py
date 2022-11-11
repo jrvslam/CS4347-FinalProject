@@ -134,7 +134,7 @@ def map_to_result_lm(batch):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        prog='obtain_wer_scores_test_set.py',
+        prog='obtain_wer_scores_test_set_with_lm.py',
         description='Obtain the WER scores on the valid and test sets'
     )
 
