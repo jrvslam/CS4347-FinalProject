@@ -101,20 +101,20 @@ if __name__ == "__main__":
         }
     )
 
-    sample_data = load_dataset(
+    dataset_transcription = load_dataset(
         'csv', data_files={
             'train': args.train_csv,
             'valid': args.val_csv,
         },
     )
 
-    sample_data = sample_data.cast(features)
+    dataset_transcription = dataset_transcription.cast(features)
 
     feature_extractor = WhisperFeatureExtractor.from_pretrained("openai/whisper-tiny", language="english")
     tokenizer = WhisperTokenizer.from_pretrained("openai/whisper-tiny", language="English", task="transcribe")
     processor = WhisperProcessor.from_pretrained("openai/whisper-tiny", language="English", task="transcribe")
 
-    sample_data = sample_data.map(prepare_dataset, remove_columns=sample_data.column_names["train"], num_proc=8)
+    dataset_transcription = dataset_transcription.map(prepare_dataset, remove_columns=dataset_transcription.column_names["train"], num_proc=8)
 
     data_collator = DataCollatorSpeechSeq2SeqWithPadding(processor=processor)
 
@@ -125,7 +125,7 @@ if __name__ == "__main__":
     model.config.suppress_tokens = []
 
     training_args = Seq2SeqTrainingArguments(
-        output_dir=args.checkpoint_folder,  # change to a repo name of your choice
+        output_dir="whisper_tiny,checkpoints/",  # change to a repo name of your choice
         per_device_train_batch_size=8,
         gradient_accumulation_steps=2,  # increase by 2x for every 2x decrease in batch size
         learning_rate=1e-5,
@@ -146,8 +146,8 @@ if __name__ == "__main__":
     trainer = Seq2SeqTrainer(
         args=training_args,
         model=model,
-        train_dataset=sample_data["train"],
-        eval_dataset=sample_data["valid"],
+        train_dataset=dataset_transcription["train"],
+        eval_dataset=dataset_transcription["valid"],
         data_collator=data_collator,
         compute_metrics=compute_metrics,
         tokenizer=processor.feature_extractor,
