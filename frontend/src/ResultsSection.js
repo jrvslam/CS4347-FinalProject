@@ -38,7 +38,21 @@ export function ResultsSection() {
                         type: 'scatter',
                       },
                     ]}
-                    layout={{width: 500, height: 350, title: 'Melody'}}
+                    layout={{
+                      width: 500,
+                      height: 350,
+                      title: 'Melody',
+                      xaxis: {
+                        title: {
+                          text: 'Time (s)',
+                        },
+                      },
+                      yaxis: {
+                        title: {
+                          text: 'MIDI Note',
+                        }
+                      }
+                    }}
                   />
                   <p> Lyrics: {lyricRes}</p>
                   </div>
