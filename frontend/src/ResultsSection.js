@@ -14,6 +14,54 @@ function bar_maker_start(sixcount){
   return bcount.concat(":",qcount,":",unit)
 }
 
+function melodyProcessing(rawMelData) {
+    const processedPiano = [];
+    let noteDurArr = [];
+    let smallestNoteDur = Number.MAX_VALUE;
+    let prevOffset = 0;
+    // normalize notes
+    for (let i = 0; i < rawMelData.length; i++) {
+        let onset = rawMelData[i][0] * 10;
+        let offset = rawMelData[i][1] * 10;
+        onset = onset.toFixed(0);
+        offset = offset.toFixed(0);
+
+        let noteBetween = onset - prevOffset;
+        if (noteBetween > 10) {
+            noteDurArr.push([noteBetween, 0]);
+        }
+        prevOffset = offset;
+
+        let noteDur = offset - onset;
+        // noteDur is length of each note in seconds * 10
+        if (noteDur < smallestNoteDur) {
+            smallestNoteDur = noteDur;
+        } 
+        noteDurArr.push([noteDur, rawMelData[i][2]]);
+    }
+
+    //assume smallestNoteDur is a sixteenth note
+    //convert noteDurArr from arr of noteDur to arr of (total sixteenth notes per note length i.e if note is crochet, value is 4)
+    let totalSixteenthNotes = 0;
+    for (let i = 0; i < noteDurArr.length; i++) {
+        let normNoteDur = noteDurArr[i][0] / smallestNoteDur;
+        normNoteDur = normNoteDur.toFixed(0);
+
+        //convert to required note notation
+        for (let j = 0; j < normNoteDur; j++) {
+            let currIdx = totalSixteenthNotes + j;
+            let noteDurStr = "0:0:" + currIdx;
+
+            processedPiano.push([noteDurStr, noteDurArr[i][1], "16n"]);
+        }
+        
+        totalSixteenthNotes = parseInt(totalSixteenthNotes) + parseInt(normNoteDur);
+    }
+    console.log("new mel proc: ", processedPiano);
+    return processedPiano;
+
+}
+ 
 function melody_processing(testing) {
   const processed_piano = [];
   for (let i = 0; i < testing.length; i++) {
@@ -91,6 +139,8 @@ function melody_processing(testing) {
         break;
       }
   }
+
+  console.log("processed: ", processed_piano);
   return processed_piano
 }
 
@@ -118,17 +168,21 @@ export function ResultsSection() {
 
   const handleChange = (event) => setDisplay(event.target.value);
 
+//   const melodyData = melody_processing(melodyRes);
+    const melodyData = melodyProcessing(melodyRes);
+
+
   const pianoRoll = <PianoRoll
     bpm={150}
     width={500}
     height={350}
-    zoom={6}
+    zoom={2}
     resolution={2}
     gridLineColor={0x333333}
     blackGridBgColor={0x1e1e1e}
     whiteGridBgColor={0x282828}
     noteFormat="MIDI"
-    noteData={melody_processing(melodyRes)}
+    noteData={melodyData}
   />
 
   const graph = <Plot
