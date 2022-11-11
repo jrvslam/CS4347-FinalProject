@@ -4,8 +4,6 @@ import Plot from 'react-plotly.js';
 import PianoRoll from "./components/PianoRoll";
 import { Box, FormControl, FormControlLabel, FormLabel, Radio, RadioGroup } from "@mui/material";
 
-let bpm = 150
-
 function bar_maker_start(sixcount){
   let bcount = Math.floor(sixcount/16).toString()
   sixcount = sixcount%16
@@ -19,25 +17,16 @@ function melody_processing(testing) {
   let endssix=0
   let note=0
   const processed_piano = [];
-  // console.log(testing.length)
-  // console.log(typeof testing)
-  // console.log(typeof testing[0])
   for (let i = 0; i < testing.length; i++) {
-    // console.log(testing[i])
-    testing[i][2]=parseFloat(testing[i][2])
-    testing[i][0]=parseFloat(testing[i][0])
-    testing[i][1]=parseFloat(testing[i][1])
     startsix=parseFloat(testing[i][0]*10).toFixed(0)
-    console.log(startsix)
     endssix=parseFloat(testing[i][1]*10).toFixed(0)
-    console.log(endssix)
 
     note=testing[i][2]
     while( (endssix-startsix) >= 16){
       processed_piano.push([bar_maker_start(startsix), note, 1])
       startsix=startsix+16
     }
-    // console.log(endssix-startsix)
+
     switch(endssix-startsix) {
       case 15:
         processed_piano.push([bar_maker_start(startsix), note, "2n"])
@@ -102,7 +91,6 @@ function melody_processing(testing) {
         processed_piano.push([bar_maker_start(startsix), note, "16n"])
         break;
       }
-      // console.log(processed_piano[-1])
   }
   return processed_piano
 }
@@ -113,14 +101,12 @@ export function ResultsSection() {
   const lyricRes = useSelector((state) => state.configuration.lyricRes);
   const [x, setX] = useState([]);
   const [y, setY] = useState([]);
-  const [pianoData, setPianoData] = useState([]);
   const [display, setDisplay] = useState('piano');
 
   useEffect(() => {
     const newX = [];
     const newY = [];
     melodyRes.forEach((note) => {
-      console.log(note);
       newX.push(note[0]);
       newX.push(note[1]);
       newY.push(note[2]);
@@ -129,7 +115,6 @@ export function ResultsSection() {
     setX(newX);
     setY(newY);
 
-    setPianoData(melody_processing(melodyRes));
   }, [melodyRes]);
 
   const handleChange = (event) => setDisplay(event.target.value);
@@ -143,15 +128,8 @@ export function ResultsSection() {
     gridLineColor={0x333333}
     blackGridBgColor={0x1e1e1e}
     whiteGridBgColor={0x282828}
-    noteData={[
-      ["0:0:0", "F5", ""],
-      ["0:0:0", "C4", "2n"],
-      ["0:0:0", "D4", "2n"],
-      ["0:0:0", "E4", "2n"],
-      ["0:2:0", "B4", "4n"],
-      ["0:3:0", "A#4", "4n"],
-      ["0:0:0", "F2", ""],
-    ]}
+    noteFormat="MIDI"
+    noteData={melody_processing(melodyRes)}
   />
 
   const graph = <Plot

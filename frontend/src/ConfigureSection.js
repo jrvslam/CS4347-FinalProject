@@ -68,7 +68,6 @@ export function ConfigureSection() {
             }
         )
         .then(res => {
-            console.log(res);
             if (!doneCheck) {
                 doneCheck = !doneCheck;
             } else {
