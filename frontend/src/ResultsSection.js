@@ -10,7 +10,7 @@ function bar_maker_start(sixcount){
   let bcount = Math.floor(sixcount/16).toString()
   sixcount = sixcount%16
   let qcount = Math.floor(sixcount/4).toString()
-  let unit = (sixcount % 4 ). toString()
+  let unit = (sixcount % 4).toString()
   return bcount.concat(":",qcount,":",unit)
 }
 
@@ -137,6 +137,8 @@ function melody_processing(testing) {
       case 1:
         processed_piano.push([bar_maker_start(onset), note, "16n"])
         break;
+      default:
+        break;
       }
   }
 
@@ -160,6 +162,8 @@ export function ResultsSection() {
       newX.push(note[1]);
       newY.push(note[2]);
       newY.push(note[2]);
+      newX.push(null);
+      newY.push(null);
     })
     setX(newX);
     setY(newY);
@@ -228,8 +232,10 @@ export function ResultsSection() {
           </FormControl>
         </Box>
         {
-            (processState !== 2) 
-                ? <p> Start Analysing some music!</p> 
+            (processState === 0) 
+                ? <p>Start Analysing some music!</p> 
+                : (processState === 1)
+                ? <p>Processing...</p> 
                 : <div>
                   <p> Lyrics: {lyricRes}</p>
                   {display === 'piano' ? pianoRoll : graph}
