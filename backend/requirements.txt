@@ -13,3 +13,4 @@ transformers
 datasets
 pyctcdecode
 kenlm
+evaluate
