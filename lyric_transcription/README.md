@@ -32,6 +32,49 @@ where
 `--checkpoint_folder - Place to store model checkpoints`
 
 
+## Evaluating the Wav2Vec2 model:
+ 
+To evaluate the Wav2Vec2 model, run:
+
+    
+    python obtain_wer_scores_test_set.py --val_csv <path_to_val_csv> --dsing_test_csv <path_to_dsing_test_csv> --nem_test_csv <path_to_nem_csv> --checkpoint_folder <path_to_model_checkpoint>
+    
+    
+where 
+
+`--val_csv - Path to csv with details about validation data`
+
+`--dsing_test_csv - Path to csv with details about DSing test data`
+
+`--nem_test_csv - Path to csv with details about N20EM test data`
+
+`--checkpoint_folder - Place to load model checkpoint from`
+
+The scores are saved in a csv folder named **wav2vec2_only_scores.csv**.
+
+## Evaluating the Wav2Vec2 model with n-gram LM:
+ 
+To evaluate the Wav2Vec2 model with an n-gram LM, run:
+
+    
+    python obtain_wer_scores_test_set_with_lm.py --val_csv <path_to_val_csv> --dsing_test_csv <path_to_dsing_test_csv> --nem_test_csv <path_to_nem_csv> --checkpoint_folder <path_to_model_checkpoint> --lm_weights <path_to_n_gram_arpa_file>
+    
+    
+where 
+
+`--val_csv - Path to csv with details about validation data`
+
+`--dsing_test_csv - Path to csv with details about DSing test data`
+
+`--nem_test_csv - Path to csv with details about N20EM test data`
+
+`--checkpoint_folder - Place to load model checkpoint from`
+
+`--lm_weights - Place to load n-gram LM from`
+
+The scores are saved in a csv folder named **wav2vec2_only_scores_lm.csv**.
+
+
 ## Training the n-gram Language Model:
 
 To train an n-gram language model, we use the [KenLM package](https://github.com/kpu/kenlm).
