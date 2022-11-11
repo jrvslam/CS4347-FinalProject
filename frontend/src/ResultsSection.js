@@ -1,11 +1,8 @@
-import React, {useState, useEffect} from "react";
-import { useSelector, useDispatch } from 'react-redux'
-import { setProcessState, setMelodyRes, setLyricRes } from "./features/configureSlice";
+import React from "react";
+import { useSelector } from 'react-redux'
 
 export function ResultsSection() {
-    const configuration = useSelector((state) => state.configuration);
-    const dispatch = useDispatch();
-
+  const configuration = useSelector((state) => state.configuration);
 
   return (
     <div>
@@ -13,7 +10,7 @@ export function ResultsSection() {
         {
             (configuration.processState !== 2) 
                 ? <p> Start Analysing some music!</p> 
-                : <p> Done Processing! </p>
+                : <p> Lyrics: {configuration.lyricRes}</p>
         }
     </div>
   );

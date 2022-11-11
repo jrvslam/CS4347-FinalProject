@@ -87,6 +87,7 @@ def predict_melody():
                 drop_last=False,
             )
             results = melody_model.predict(test_loader)
+            file.close()
             return jsonify(results)
     return '''
         <html>
@@ -119,8 +120,7 @@ def transcribe_lyrics():
             sf.write(new_filename, y, sr)
             transcription = pipeline(new_filename)
             file.close()
-            payload = {"text": transcription}
-            return jsonify(payload)
+            return jsonify(transcription)
     return '''
         <html>
             <body>

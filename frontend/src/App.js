@@ -1,8 +1,7 @@
 import "./App.css";
 import Grid from "@mui/material/Grid";
 import { Box } from "@mui/system";
-import { Button, Paper } from "@mui/material";
-import FileUploadIcon from "@mui/icons-material/FileUpload";
+import { Paper } from "@mui/material";
 
 import { ConfigureSection } from "./ConfigureSection.js";
 import { ResultsSection } from "./ResultsSection.js";
@@ -12,7 +11,6 @@ function App() {
     <div>
       <div className="App">
         <header className="App-header">
-          {/* <img src={logo} className="App-logo" alt="logo" /> */}
           <h2>Musify</h2>
         </header>
       </div>

@@ -2,8 +2,7 @@ import React, {useState, useEffect} from "react";
 import { useSelector, useDispatch } from 'react-redux'
 import { setProcessState, setMelodyRes, setLyricRes } from "./features/configureSlice";
 
-import { Box } from "@mui/system";
-import { Button, Paper } from "@mui/material";
+import { Button } from "@mui/material";
 import LoadingButton from '@mui/lab/LoadingButton';
 import FileUploadIcon from "@mui/icons-material/FileUpload";
 
@@ -109,8 +108,8 @@ export function ConfigureSection() {
             return res.json();
         })
         .then(result => {
-            console.log("LYRICS Results: ", result.result);
-            lyricRes = result.result;
+            console.log("LYRICS Results: ", result.text);
+            lyricRes = result.text;
             dispatch(setLyricRes(lyricRes));
             
         })
@@ -139,7 +138,9 @@ export function ConfigureSection() {
       </Button>
       {isSelected ? (
         <div>
-            <p>Filename: {selectedFile.name}</p>
+          <p style={{ wordBreak: "break-word" }}>
+            Filename: {selectedFile.name}
+          </p>
         </div>
       ) : (
             <p>Select a file to show details</p>

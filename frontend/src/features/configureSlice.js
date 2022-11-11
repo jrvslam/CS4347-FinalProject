@@ -4,8 +4,8 @@ export const configureSlice = createSlice({
     name: 'configuration',
     initialState: {
         processState: 0,
-        melodyRes: {},
-        lyricRes: {}
+        melodyRes: [],
+        lyricRes: ''
     },
     reducers: {
         setProcessState: {
