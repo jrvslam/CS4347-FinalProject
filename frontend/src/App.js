@@ -6,8 +6,22 @@ import FileUploadIcon from "@mui/icons-material/FileUpload";
 
 import { ConfigureSection } from "./ConfigureSection.js";
 import { ResultsSection } from "./ResultsSection.js";
-
+import { useState,useCallback } from "react";
 function App() {
+  const [melodyOutput, setMelofyOutput] = useState([])
+  const [lyricsOutput, setLyricsOutput] = useState([])
+  
+  const getMelodyOutput = useCallback(value => {
+      setMelofyOutput(value)
+    },[]
+  );
+
+  const getLyricsOutput = useCallback(value => {
+    setLyricsOutput(value)
+  },[]
+);
+
+
   return (
     <div>
       <div className="App">
@@ -23,7 +37,7 @@ function App() {
               <Paper elevation={3}>
                 <Box p={2} sx={{ height: 500 }}>
                   {
-                    ConfigureSection()
+                    ConfigureSection(getMelodyOutput, getLyricsOutput)
                   }
                 </Box>
               </Paper>
@@ -34,7 +48,7 @@ function App() {
               <Paper elevation={3}>
                 <Box p={2} sx={{ height: 500 }}>
                   {
-                    ResultsSection()
+                    ResultsSection(melodyOutput,lyricsOutput)
                   }
                 </Box>
               </Paper>
