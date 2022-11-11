@@ -18,11 +18,14 @@ function melodyProcessing(rawMelData) {
     const processedPiano = [];
     let noteDurArr = [];
     let smallestNoteDur = Number.MAX_VALUE;
+    let lowestNote = Number.MAX_VALUE;
+    let highestNote = 0;
     let prevOffset = 0;
     // normalize notes
     for (let i = 0; i < rawMelData.length; i++) {
         let onset = rawMelData[i][0] * 10;
         let offset = rawMelData[i][1] * 10;
+        let note = rawMelData[i][2];
         onset = onset.toFixed(0);
         offset = offset.toFixed(0);
 
@@ -37,7 +40,15 @@ function melodyProcessing(rawMelData) {
         if (noteDur < smallestNoteDur) {
             smallestNoteDur = noteDur;
         } 
-        noteDurArr.push([noteDur, rawMelData[i][2]]);
+
+        if (note < lowestNote) {
+            lowestNote = note;
+        }
+        if (note > highestNote) {
+            highestNote = note;
+        }
+        
+        noteDurArr.push([noteDur, note]);
     }
 
     //assume smallestNoteDur is a sixteenth note
@@ -52,11 +63,17 @@ function melodyProcessing(rawMelData) {
             let currIdx = totalSixteenthNotes + j;
             let noteDurStr = "0:0:" + currIdx;
 
-            processedPiano.push([noteDurStr, noteDurArr[i][1], "16n"]);
+            if (noteDurArr[i][1] !== 0) {
+                processedPiano.push([noteDurStr, noteDurArr[i][1], "16n"]);
+            }
+
+            
         }
         
         totalSixteenthNotes = parseInt(totalSixteenthNotes) + parseInt(normNoteDur);
     }
+    processedPiano.push(["0:0:0", parseInt(highestNote) + 2, ""]);
+    processedPiano.push(["0:0:0", parseInt(lowestNote) - 2, ""]);
     console.log("new mel proc: ", processedPiano);
     return processedPiano;
 
@@ -232,6 +249,7 @@ export function ResultsSection() {
                 ? <p> Start Analysing some music!</p> 
                 : <div>
                   <p> Lyrics: {lyricRes}</p>
+                  <p> Melody: </p>
                   {display === 'piano' ? pianoRoll : graph}
                   </div>
         }
