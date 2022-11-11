@@ -32,6 +32,12 @@ where
 `--checkpoint_folder - Place to store model checkpoints`
 
 
+## Training the n-gram Language Model:
+
+To train an n-gram language model, we use the [KenLM package](https://github.com/kpu/kenlm).
+Please refer to the instructions provided in the KenLM repository for setting up the package and building an n-gram language model.
+It is recommended to take the transcriptions from the training corpus, and dump each transcription in a new-line separated text file, and use that with KenLM for training the language model.
+
 ## Evaluating the Wav2Vec2 model:
  
 To evaluate the Wav2Vec2 model, run:
@@ -74,13 +80,6 @@ where
 
 The scores are saved in a csv folder named **wav2vec2_only_scores_lm.csv**.
 
-
-## Training the n-gram Language Model:
-
-To train an n-gram language model, we use the [KenLM package](https://github.com/kpu/kenlm).
-Please refer to the instructions provided in the KenLM repository for setting up the package and building an n-gram language model.
-It is recommended to take the transcriptions from the training corpus, and dump each transcription in a new-line separated text file, and use that with KenLM for training the language model.
-
 ## Run Lyric Transcription for one file:
  
 To perform lyric transcription for one file, run:
@@ -98,6 +97,22 @@ where
 The script runs the trained Wav2Vec2 model  on the file and prints the transcribed lyrics. 
 The transcribed lyrics are also stored in a file called **"transcribed_output.txt"**
 
+
+## Training the Whisper model:
+ 
+To train the Whisper-Tiny model, run:
+
+    
+    python train_whisper.py --train_csv <path_to_train_csv> --val_csv <path_to_val_csv> --checkpoint_folder <path_to_store_checkpoint>
+    
+    
+where 
+
+`--train_csv - Path to csv with details about training data`
+
+`--val_csv - Path to csv with details about validation data`
+
+`--checkpoint_folder - Place to store model checkpoints`
 
 # References and Resources
 
