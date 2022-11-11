@@ -114,6 +114,26 @@ where
 
 `--checkpoint_folder - Place to store model checkpoints`
 
+## Evaluating the Whisper model:
+ 
+To evaluate the Whisper-Tiny model, run:
+
+    
+    python obtain_wer_scores_test_set_whisper.py --val_csv <path_to_val_csv> --dsing_test_csv <path_to_dsing_test_csv> --nem_test_csv <path_to_nem_csv> --checkpoint_folder <path_to_model_checkpoint>
+    
+    
+where 
+
+`--val_csv - Path to csv with details about validation data`
+
+`--dsing_test_csv - Path to csv with details about DSing test data`
+
+`--nem_test_csv - Path to csv with details about N20EM test data`
+
+`--checkpoint_folder - Place to load model checkpoint from`
+
+The scores are saved in a csv folder named **Results_whisper.csv**.
+
 # References and Resources
 
 The following links and blogs were extremely useful in terms of understanding the various concepts, and utilizing code to train our models with on the new lyric dataset.
