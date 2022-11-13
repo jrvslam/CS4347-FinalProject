@@ -1,3 +1,0 @@
-const getMelodyExtraction = () => {
-    fetch
-}

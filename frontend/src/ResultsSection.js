@@ -13,18 +13,9 @@ import {
   Stack,
 } from "@mui/material";
 
-const smallest = 1 / 16;
 var defbpm = 150;
 var defzoom = 2;
 var a;
-
-function bar_maker_start(sixcount) {
-  let bcount = Math.floor(sixcount / 16).toString();
-  sixcount = sixcount % 16;
-  let qcount = Math.floor(sixcount / 4).toString();
-  let unit = (sixcount % 4).toString();
-  return bcount.concat(":", qcount, ":", unit);
-}
 
 function melodyProcessing(rawMelData) {
   const processedPiano = [];
@@ -93,90 +84,6 @@ function melodyProcessing(rawMelData) {
   }
   console.log("new mel proc: ", processedPiano);
   return processedPiano;
-}
-
-function melody_processing(testing) {
-  const processed_piano = [];
-  for (let i = 0; i < testing.length; i++) {
-    let onset = (testing[i][0] / smallest).toFixed(0);
-    const offset = (testing[i][1] / smallest).toFixed(0);
-    const note = testing[i][2];
-
-    while (offset - onset >= 16) {
-      processed_piano.push([bar_maker_start(onset), note, 1]);
-      onset = onset + 16;
-    }
-
-    switch (offset - onset) {
-      case 15:
-        processed_piano.push([bar_maker_start(onset), note, "2n"]);
-        processed_piano.push([bar_maker_start(onset + 8), note, "4n"]);
-        processed_piano.push([bar_maker_start(onset + 12), note, "8n"]);
-        processed_piano.push([bar_maker_start(onset + 14), note, "16n"]);
-        break;
-      case 14:
-        processed_piano.push([bar_maker_start(onset), note, "2n"]);
-        processed_piano.push([bar_maker_start(onset + 8), note, "4n"]);
-        processed_piano.push([bar_maker_start(onset + 12), note, "8n"]);
-        break;
-      case 13:
-        processed_piano.push([bar_maker_start(onset), note, "2n"]);
-        processed_piano.push([bar_maker_start(onset + 8), note, "4n"]);
-        processed_piano.push([bar_maker_start(onset + 12), note, "16n"]);
-        break;
-      case 12:
-        processed_piano.push([bar_maker_start(onset), note, "2n"]);
-        processed_piano.push([bar_maker_start(onset + 8), note, "4n"]);
-        break;
-      case 11:
-        processed_piano.push([bar_maker_start(onset), note, "2n"]);
-        processed_piano.push([bar_maker_start(onset + 8), note, "8n"]);
-        processed_piano.push([bar_maker_start(onset + 10), note, "16n"]);
-        break;
-      case 10:
-        processed_piano.push([bar_maker_start(onset), note, "2n"]);
-        processed_piano.push([bar_maker_start(onset + 8), note, "8n"]);
-        break;
-      case 9:
-        processed_piano.push([bar_maker_start(onset), note, "2n"]);
-        processed_piano.push([bar_maker_start(onset + 8), note, "16n"]);
-        break;
-      case 8:
-        processed_piano.push([bar_maker_start(onset), note, "2n"]);
-        break;
-      case 7:
-        processed_piano.push([bar_maker_start(onset), note, "4n"]);
-        processed_piano.push([bar_maker_start(onset + 4), note, "8n"]);
-        processed_piano.push([bar_maker_start(onset + 2), note, "16n"]);
-        break;
-      case 6:
-        processed_piano.push([bar_maker_start(onset), note, "4n"]);
-        processed_piano.push([bar_maker_start(onset + 4), note, "8n"]);
-        break;
-      case 5:
-        processed_piano.push([bar_maker_start(onset), note, "4n"]);
-        processed_piano.push([bar_maker_start(onset + 2), note, "16n"]);
-        break;
-      case 4:
-        processed_piano.push([bar_maker_start(onset), note, "4n"]);
-        break;
-      case 3:
-        processed_piano.push([bar_maker_start(onset), note, "8n"]);
-        processed_piano.push([bar_maker_start(onset + 2), note, "16n"]);
-        break;
-      case 2:
-        processed_piano.push([bar_maker_start(onset), note, "8n"]);
-        break;
-      case 1:
-        processed_piano.push([bar_maker_start(onset), note, "16n"]);
-        break;
-      default:
-        break;
-    }
-  }
-
-  console.log("processed: ", processed_piano);
-  return processed_piano;
 }
 
 export function ResultsSection() {
