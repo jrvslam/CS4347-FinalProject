@@ -5,7 +5,8 @@ export const configureSlice = createSlice({
     initialState: {
         processState: 0,
         melodyRes: [],
-        lyricRes: ''
+        lyricRes: '',
+        audioURL: ""
     },
     reducers: {
         setProcessState: {
@@ -34,11 +35,20 @@ export const configureSlice = createSlice({
             prepare: (result) => {
                 return { payload: result };
             }
+        },
+        setAudioURL: {
+            reducer: (state, action) => {
+                const audioURL = action.payload;
+                state.audioURL = audioURL;
+            },
+            prepare: (audioURL) => {
+                return { payload: audioURL };
+            }
         }
     }
 })
 
 
-export const { setProcessState, setMelodyRes, setLyricRes } = configureSlice.actions
+export const { setProcessState, setMelodyRes, setLyricRes, setAudioURL } = configureSlice.actions
 
 export default configureSlice.reducer
