@@ -88,9 +88,9 @@ To perform lyric transcription for one file, run:
     
 where 
 
-`--checkpoint_path - Path to csv with details about training data`
+`--checkpoint_path - Path to checkpoint folder (checkpoint-4000 folder)`
 
-`--lm_model_file - Path to csv with details about validation data`
+`--lm_model_file - Path to .arpa folder present inside the model checkpoint folder (checkpoint-4000/3gram.arpa)`
 
 `--audio_path - Path to audio file to transcribe`
 
