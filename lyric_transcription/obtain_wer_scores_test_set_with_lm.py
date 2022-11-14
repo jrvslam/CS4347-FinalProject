@@ -204,16 +204,25 @@ if __name__ == "__main__":
     val_results = dataset_transcription["valid"].map(map_to_result_lm,
                                                      remove_columns=dataset_transcription["valid"].column_names,
                                                      load_from_cache_file=False)
-    val_wer = wer_metric.compute(predictions=val_results["pred_str"], references=dataset_transcription["valid"]["text"])
+    
+    val_results_final = [x[0] for x in val_results["pred_str"]]
+
+    val_wer = wer_metric.compute(predictions=val_results_final, references=dataset_transcription["valid"]["text"])
 
     dsing_test_results = dataset_transcription["dsing_test"].map(map_to_result_lm, remove_columns=dataset_transcription[
         "dsing_test"].column_names, load_from_cache_file=False)
-    dsing_test_wer = wer_metric.compute(predictions=dsing_test_results["pred_str"],
+    
+    dsing_results_final = [x[0] for x in dsing_test_results["pred_str"]]
+
+    dsing_test_wer = wer_metric.compute(predictions=dsing_results_final,
                                         references=dataset_transcription["dsing_test"]["text"])
 
     nem_test_results = dataset_transcription["n20em_test"].map(map_to_result_lm, remove_columns=dataset_transcription[
         "n20em_test"].column_names, load_from_cache_file=False)
-    nem_test_wer = wer_metric.compute(predictions=nem_test_results["pred_str"],
+    
+    nem_results_final = [x[0] for x in nem_test_results["pred_str"]]
+    
+    nem_test_wer = wer_metric.compute(predictions=nem_results_final,
                                       references=dataset_transcription["n20em_test"]["text"])
 
     scores = [[val_wer, dsing_test_wer, nem_test_wer]]
